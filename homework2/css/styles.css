@@ -1,0 +1,49 @@
+
+body {
+  
+font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+background-image: url("../imgs/la_cloud.jpg");
+background-repeat:no-repeat;
+background-size: 100% 85%;
+background-position:center;
+}
+
+html {
+position: relative;
+min-height: 100%;
+}
+
+main {
+  margin: 40px 0;
+}
+
+.block {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.block-header {
+  color: orange;
+  font-family: "Times New Roman", serif;
+  font-weight: bold;
+}
+.about-me-header {
+  margin-bottom: 33px;
+  font-size: 32px;
+  font-weight: bold;
+  color: orange
+}
+
+/* P15 photo of me */
+#abt-img {
+  float: left;
+  width: 200px;
+  margin: 0 20px 10px 0;
+}
+.port-image {
+  margin: 20px auto;
+}
+
+
+
+
