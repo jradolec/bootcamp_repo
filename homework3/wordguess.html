@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Word Guess Game using AWS Rekognition</title>
+    <!-- <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/nice80sHeader.css"> -->
+
+
+
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.465.0.min.js">
+
+
+// Initialize the Amazon Cognito credentials provider
+AWS.config.region = 'us-west-2'; // Region
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: 'us-west-2:69415795-9219-4b37-a7ae-bd71549dfdf5',
+});
+
+// var myCredentials = new AWS.CognitoIdentityCredentials({IdentityPoolId:'bootcamp'});
+// var myConfig = new AWS.Config({
+//   credentials: myCredentials, region: 'us-west-2'
+// });
+
+// set the default config object
+var creds = new AWS.CognitoIdentityCredentials({
+ IdentityPoolId: 'us-west-2:69415795-9219-4b37-a7ae-bd71549dfdf5'
+});
+AWS.config.credentials = creds;
+console.log(creds);
+
+// Create the IAM service object
+var iam = new AWS.IAM({apiVersion: '2010-05-08'});
+
+var params = {
+  MaxItems: 10
+};
+
+iam.listUsers(params, function(err, data) {
+  if (err) {
+    console.log("Error", err);
+  } else {
+    var users = data.Users || [];
+    users.forEach(function(user) {
+      document.write("User " + user.UserName + " created", user.CreateDate);
+    });
+  }
+});
+
+
+
+
+
+</script>
+
+
+
+
+
+  </head>
+
+
+  
+  <body>    
+
+<!-- 
+    
+    <div id="wrapper">
+      <h1 class="chrome">WORD GUESS</h1>
+      <h3 class="dreams">80s style</h3>
+    </div>
+
+    <div id="container">
+      <h2 id="music"></h2>
+      
+      <div id="band-div"><img src="assets/images/hangman-boardgame.jpg" alt="hangman board game from 80s"></div>
+      <div id="game-section">
+        <p>Press any key to get started!</p>
+        <div>
+          <h3 class="section-title">Wins</h3>
+          
+          <div id="wins"></div>
+        </div>
+        <div id="current-word-section">
+          <h3 class="section-title">Current Word</h3>
+          
+          <div id="current-word"></div>
+        </div>
+        <div id="guesses-remaining-section">
+          <h3 class="section-title">Number of Guesses Remaining</h3>
+         
+          <div id="guesses-remaining"></div>
+        </div>
+        <div id="guessed-letters-section">
+          <h3 class="section-title">Letters Already Guessed</h3>
+          
+          <div id="guessed-letters"></div>
+        </div>
+      </div>
+    </div>
+
+    Linking to our JavaScript file.
+    <script type="text/javascript" src="assets/javascript/game.js"></script> -->
+  </body>
+</html>
