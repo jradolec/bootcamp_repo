@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>AWS SDK for JavaScript - Browser Getting Started Application</title>
+  </head>
+
+  <body>
+    <div id="textToSynth">
+      <input autofocus size="23" type="text" id="textEntry" value="It's very good to meet you."/>
+      <button class="btn default" onClick="speakText()">Synthesize</button>
+      <p id="result">Enter text above then click Synthesize</p>
+    </div>
+    <audio id="audioPlayback" controls>
+      <source id="audioSource" type="audio/mp3" src="">
+    </audio>
+
+    <div id="results">data</div>
+
+
+    <script src="./aws-sdk-2.480.0.min.js"></script>
+    <script type="text/javascript">
+
+
+
+        // // Initialize the Amazon Cognito credentials provider
+        // AWS.config.region = 'us-west-2'; // Region
+        // AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        //     IdentityPoolId: 'us-west-2:69415795-9219-4b37-a7ae-bd71549dfdf5',
+        // });
+
+        var cognitoUser = 
+        aws.CognitoIdentityCredentials
+
+if (cognitoUser != null) {
+	cognitoUser.getSession(function(err, result) {
+		if (result) {
+			console.log('You are now logged in.');
+
+			// Add the User's Id Token to the Cognito credentials login map.
+			AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+				IdentityPoolId: 'us-west-2_DuZG1jSNz',
+				Logins: {
+					'cognito-idp.us-west-2.amazonaws.com/us-west-2_DuZG1jSNz': result.getIdToken().getJwtToken()
+				}
+			});
+		}
+	});
+}
+
+        // Set your needed values
+    var IDENTITY_POOL_ID = 'us-west-2_DuZG1jSNz';
+    var ACCOUNT_ID = '819213478384';
+    var REGION = 'us-west-2';
+    // Initialize the Amazon Cognito credentials provider
+    AWS.config.region = REGION; // Region
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: IDENTITY_POOL_ID,});
+    var getIdParams = {
+      IdentityPoolId: IDENTITY_POOL_ID,
+      AccountId: ACCOUNT_ID
+    };
+    var cognitoidentity = new AWS.CognitoIdentity({apiVersion: '2014-06-30'});
+    cognitoidentity.getId(getIdParams, function(err, data) {
+      if (err) {
+        results.innerHTML = "Error" + err;
+      } else {
+        results.innerHTML =  "Cognito Identity ID is " + data.IdentityId;
+      }
+    });
+
+
+    // Make the call to obtain credentials
+AWS.config.credentials.get(function(){
+
+// Credentials will be available when this function is called.
+var accessKeyId = AWS.config.credentials.accessKeyId;
+var secretAccessKey = AWS.config.credentials.secretAccessKey;
+var sessionToken = AWS.config.credentials.sessionToken;
+
+});
+      
+//         // Initialize the Amazon Cognito credentials provider
+//         AWS.config.region = 'us-west-2'; 
+//         AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: 'us-west-2_DuZG1jSNz'});
+        
+//         // Create user pool objects first
+//     var poolData = {
+//             UserPoolId : 'us-west-2_DuZG1jSNz', // your user pool id here
+//             ClientId : '211np1hoh4d995h569ehsds1hb' // your app client id here
+//             };
+            
+//     var userPool = new AWS.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+
+        
+//     var userData = {
+//             Username : 'jason.radolec@gmail.com', // your username here
+//             Pool : userPool
+//             };
+
+//     var attributeList = [];
+//     var attributeName = new AWS.CognitoIdentityServiceProvider.CognitoUserAttribute('name','John Smith');
+//     var attributeAddress =new AWS.CognitoIdentityServiceProvider.CognitoUserAttribute('address','555 S 5th Street');
+//     var attributeEmail =new AWS.CognitoIdentityServiceProvider.CognitoUserAttribute('email','jason.radolec@gmail.com');
+//         attributeList.push(attributeName);
+//         attributeList.push(attributeAddress);
+//         attributeList.push(attributeEmail);
+
+// var cognitoUser;
+// userPool.signUp('johns', 'P@ssw0rd', attributeList, null, function(err, result){
+//     if (err) {
+//         console.log(err);
+//         return;
+//     }
+
+//     cognitoUser = result.user;
+//     console.log('user name is ' + cognitoUser.getUsername());
+// })
+
+
+
+
+
+        // Function invoked by button click
+        function speakText() {
+            // Create the JSON parameters for getSynthesizeSpeechUrl
+            var speechParams = {
+                OutputFormat: "mp3",
+                SampleRate: "16000",
+                Text: "",
+                TextType: "text",
+                VoiceId: "Matthew"
+            };
+            speechParams.Text = document.getElementById("textEntry").value;
+            
+            // Create the Polly service object and presigner object
+            var polly = new AWS.Polly({apiVersion: '2016-06-10'});
+            var signer = new AWS.Polly.Presigner(speechParams, polly)
+        
+            // Create presigned URL of synthesized speech file
+            signer.getSynthesizeSpeechUrl(speechParams, function(error, url) {
+            if (error) {
+                document.getElementById('result').innerHTML = error;
+            } else {
+                document.getElementById('audioSource').src = url;
+                document.getElementById('audioPlayback').load();
+                document.getElementById('result').innerHTML = "Speech ready to play.";
+            }
+          });
+        }
+    </script>
+  </body>
+</html>
