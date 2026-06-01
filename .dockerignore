@@ -1,0 +1,12 @@
+.git
+.github
+.gitignore
+.dockerignore
+dist
+*.tar
+*.tar.gz
+README.md
+test
+Dockerfile.fips
+docker-compose.yml
+Makefile
