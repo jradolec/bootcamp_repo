@@ -12,4 +12,8 @@ FROM ${BASE_IMAGE}
 COPY squid.conf /etc/squid.conf
 
 EXPOSE 3128
-CMD ["/usr/sbin/squid", "-N", "-f", "/etc/squid.conf"]
+
+# Replace any inherited Chainguard entrypoint so Docker does not append this
+# command to the base image ENTRYPOINT at runtime.
+ENTRYPOINT ["/usr/sbin/squid", "-N", "-f", "/etc/squid.conf"]
+CMD []
