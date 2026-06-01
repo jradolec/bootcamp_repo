@@ -1,0 +1,13 @@
+services:
+  squid:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Default public image. For private Chainguard org images, set:
+        # BASE_IMAGE=cgr.dev/${CHAINGUARD_ORG}/squid-proxy:latest
+        BASE_IMAGE: ${BASE_IMAGE:-cgr.dev/chainguard/squid-proxy:latest}
+    image: ${IMAGE_NAME:-secure-squid-chainguard}:${IMAGE_TAG:-latest}
+    ports:
+      - "3128:3128"
+    restart: unless-stopped

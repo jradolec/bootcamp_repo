@@ -1,0 +1,71 @@
+name: Build secure Squid image
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: secure-squid-chainguard
+  IMAGE_TAG: latest
+  CHAINGUARD_IDENTITY: ${{ secrets.CHAINGUARD_IDENTITY }}
+
+jobs:
+  build-test-scan-package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Chainguard Registry (optional private org images)
+        if: ${{ env.CHAINGUARD_IDENTITY != '' }}
+        uses: chainguard-dev/actions/setup-chainctl@v1
+        with:
+          identity: ${{ env.CHAINGUARD_IDENTITY }}
+
+      - name: Log in to cgr.dev with chainctl (optional private org images)
+        if: ${{ env.CHAINGUARD_IDENTITY != '' }}
+        run: chainctl auth configure-docker --pull-token --save
+
+      - name: Build image
+        run: make build
+
+      - name: Run smoke test
+        run: make test
+
+      - name: Install Trivy
+        uses: aquasecurity/setup-trivy@v0.2.3
+
+      - name: Scan image with Trivy
+        run: trivy image --exit-code 1 --severity HIGH,CRITICAL --format table "$IMAGE_NAME:$IMAGE_TAG"
+
+      - name: Install Syft if possible
+        continue-on-error: true
+        run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Generate SBOM with Syft if available
+        run: |
+          mkdir -p dist
+          if command -v syft >/dev/null 2>&1; then
+            syft "$IMAGE_NAME:$IMAGE_TAG" -o spdx-json=dist/secure-squid-chainguard.spdx.json
+          else
+            echo "Syft is not installed on this runner; skipping SBOM generation."
+          fi
+
+      - name: Save image tarball
+        run: make save
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: secure-squid-chainguard-image
+          path: |
+            dist/secure-squid-chainguard.tar.gz
+            dist/secure-squid-chainguard.spdx.json
+          if-no-files-found: warn

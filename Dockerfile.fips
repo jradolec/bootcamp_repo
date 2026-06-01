@@ -1,0 +1,18 @@
+# syntax=docker/dockerfile:1
+
+# FIPS/STIG-hardened images are private-org images. Authenticate to the
+# Chainguard Registry before building (see README.md), then run:
+#   docker build -f Dockerfile.fips --build-arg CHAINGUARD_ORG=<org> .
+ARG CHAINGUARD_ORG
+FROM cgr.dev/${CHAINGUARD_ORG}/squid-proxy-fips:latest
+
+# The FIPS runtime image has no shell/package manager. Keep the image minimal:
+# only copy configuration and do not rely on runtime package installation.
+COPY squid.conf /etc/squid.conf
+
+EXPOSE 3128
+
+# Replace any inherited Chainguard entrypoint so Docker does not append this
+# command to the base image ENTRYPOINT at runtime.
+ENTRYPOINT ["/usr/sbin/squid", "-N", "-f", "/etc/squid.conf"]
+CMD []
